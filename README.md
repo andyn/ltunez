@@ -4,7 +4,7 @@ S-38.3152 NMPS Assignment 1: lTunez
 Overview
 --------
 
-ITunez is a program that streams audio over RTSP/RTP in 8-bit 8 kHz PCM format.
+ITunez (spelled with Ell, not Eye) is a program that streams audio over RTSP/RTP in 8-bit 8 kHz PCM format.
 
 Requirements
 ------------
