@@ -77,20 +77,39 @@ class RTPStream(threading.Thread):
 		print "Stopped RTP streaming to %s." % ", ".join([addr+":"+str(port) for addr, port in self.recipients])
 
 
+def read_wav(filename):
+	wav_data = None
+	try:
+		wav_file = open(filename, "rb")
+		wav_data = wav_file.read()[44:]
+		wav_file.close()
+	except:
+		print "Error opening wave file %s" % (filename)
+	return wav_data
 
+
+def print_statistics():
+	print "\nDummy statistics: 23452345 bytes sent over a period of 127812 minutes"
 
 if __name__ == "__main__":
 
-	wav_file = open("cache/merrygo.wav", "rb")
-	wav_data = wav_file.read()[44:]
-	wav_file.close()
-	stream = RTPStream([("localhost", 6000)], wav_data)
-	stream.start()
+	audio = read_wav("cache/merrygo.wav")
+	if audio:
+		stream = RTPStream([("localhost", 6000)], audio)
+		stream.start()
 
-	try:
-		while True:
+	running = True
+	while running:
+		try:
 			time.sleep(1)
-	except KeyboardInterrupt:
-		print "\nReceived ^C, shutting down"
-		stream.running = False
-		stream.join()
+
+		except KeyboardInterrupt:
+			print_statistics()
+			# Two times ^C in rapid succession quits the program
+			try:
+				time.sleep(1)
+			except KeyboardInterrupt:
+				running = False
+
+	stream.running = False
+	stream.join()
