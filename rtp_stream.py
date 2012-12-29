@@ -6,7 +6,7 @@ import random
 from rtp import *
 import select
 from socket import *
-from sockhelp import *
+from socket_util import *
 import threading
 import time
 
@@ -31,15 +31,20 @@ class RTPStream(threading.Thread):
 			self.rtp_socket = udp_bind("0.0.0.0", rtp_port)
 			self.rtcp_socket = udp_bind("0.0.0.0", rtcp_port)
 			if not self.rtp_socket or not self.rtcp_socket:
-				print "Could not bind both RTP and RCTP, retrying..."
+				print "Could not bind both RTP and RCTP ports, retrying..."
 				continue
 			break
 
+	def stop(self):
+		self.running = False
+
 	def run(self):
-		running = True
+		print "Started RTP streaming to %s." % ", ".join([addr+":"+str(port) for addr, port in self.recipients])
+
+		self.running = True
 		packet = RTPPacket() # We'll reuse this for efficiency.
 		self.starttime = time.time()
-		while running:
+		while self.running:
 
 			# rtp timing
 			next_packet = self.starttime + float(self.counter) / 8000.0
@@ -50,7 +55,7 @@ class RTPStream(threading.Thread):
 			ready_in, _, _ = select.select([self.rtp_socket], [], [], 0)
 			if self.rtp_socket in ready_in:
 				data = rtcp_socket.recvfrom(1500)
-				print "Received RTCP:", data
+				print "Received RTCP packet:", data
 
 			# create rtp packet and send it to all recipients
 			packet.ssrc = self.ssrc
@@ -66,17 +71,26 @@ class RTPStream(threading.Thread):
 			self.counter += FRAMES_PER_PACKET
 			self.timestamp += FRAMES_PER_PACKET
 			self.sequence_number += 1
-			if self.counter > len(self.stream_data):
+			if self.counter > len(self.stream_data) or 0 == len(self.recipients):
 				running = False
 
+		print "Stopped RTP streaming to %s." % ", ".join([addr+":"+str(port) for addr, port in self.recipients])
 
 
 
 
 if __name__ == "__main__":
-	wav_file = open("merrygo.wav", "rb")
+
+	wav_file = open("cache/merrygo.wav", "rb")
 	wav_data = wav_file.read()[44:]
 	wav_file.close()
-
 	stream = RTPStream([("localhost", 6000)], wav_data)
 	stream.start()
+
+	try:
+		while True:
+			time.sleep(1)
+	except KeyboardInterrupt:
+		print "\nReceived ^C, shutting down"
+		stream.running = False
+		stream.join()
