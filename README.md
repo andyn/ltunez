@@ -26,6 +26,8 @@ Running the server:
 
     ./ltunez-server
 
+The server show statistics when ^C is pressed once. ^C twice in rapid succession quits the server software.
+
 Running the client:
 
     ./ltunez-client
