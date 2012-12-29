@@ -89,7 +89,7 @@ def read_wav(filename):
 
 
 def print_statistics():
-	print "\nDummy statistics: 23452345 bytes sent over a period of 127812 minutes"
+	print "Dummy statistics: 23452345 bytes sent over a period of 127812 minutes"
 
 if __name__ == "__main__":
 
@@ -109,6 +109,7 @@ if __name__ == "__main__":
 			try:
 				time.sleep(1)
 			except KeyboardInterrupt:
+				print "\n"
 				running = False
 
 	stream.running = False
