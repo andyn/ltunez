@@ -21,7 +21,7 @@ def tcp_listen(address, port):
 		s.bind((address, port))
 		s.listen(TCP_BACKLOG)
 	except:
-		print "Error binding to TCP/%s:%d" & (address, port)
+		print "Error binding to TCP/%s:%d" % (address, port)
 	return s
 
 def tcp_connect(address, port):
@@ -30,7 +30,7 @@ def tcp_connect(address, port):
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.connect((address, port))
 	except:
-		print "Error connecting to TCP/%s:%d" & (address, port)
+		print "Error connecting to TCP/%s:%d" % (address, port)
 	return s
 
 	
