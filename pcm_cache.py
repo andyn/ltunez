@@ -5,6 +5,8 @@ Caches PCM audio files in a directory.
 Uses the avconv command line tool to convert audio files to 8000 Hz mono PCM files.
 """
 
+# FIXME -- The code is full of references to avconv (from libav) even though we use FFmpeg.
+
 import os
 from os import path
 import subprocess
@@ -13,9 +15,9 @@ class PCMCache(object):
     """Caches PCM audio files in a directory."""
 
     def __init__(self,
-                 cache_dir = None,
-                 source_dir = None,
-                 avconv_path = 'avconv',
+                 cache_dir = "cache",
+                 source_dir = "audio",
+                 avconv_path = 'ffmpeg',
                  cache_suffix = '.wav'):
         """Create a new PCMCache.
 
@@ -78,19 +80,22 @@ class PCMCache(object):
 
     def add_file(self, source, target):
         with open(os.devnull, "wb") as null:
-            subprocess.call([self.avconv_path,
+            # -i source.mp3 -acodec pcm_mulaw -ar 8000 -ac 1 asd_8k.wav
+            subprocess.call([self.avconv,
                              '-i', source, # source file name
-                             '-c:a', 'pcm_u8', # 8-bit µ-law
+                             '-acodec', 'pcm_mulaw', # 8-bit µ-law
                              '-ar', '8000', # 8000 Hz
                              '-ac', '1', # mono
-                             target], # output file name, in cache
-                            stdout = null, stderr = null)
+                             target # output file name in cache directory
+                            ], stdout = null, stderr = null)
+        except:
+            print "Fatal: system has no /dev/null or equivalent bit bucket."
 
 
 
 if __name__ == "__main__":
     print "Updating cache."
-    p = PCMCache(cache_dir = 'cache', source_dir = 'mp3')
+    p = PCMCache()
     print "Cache updated! Current files:"
     for filename in p.get_cached_files():
         print " ", filename
