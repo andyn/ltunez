@@ -16,18 +16,8 @@ Requirements
 Quick start quide
 -----------------
 
-There is a directory called mp3. Add some avconv-able files (such as MP3s) there.
-Run the server. Run the client.
+run `python rtp_stream.py`. It will stream sample audio to localhost:6000 over RTP. Make sure you have VLC or
+a similar player listening on that port
 
-Usage
------
+Hit ^C twice within one second to quit. 
 
-Running the server:
-
-    ./ltunez-server
-
-The server show statistics when ^C is pressed once. ^C twice in rapid succession quits the server software.
-
-Running the client:
-
-    ./ltunez-client
